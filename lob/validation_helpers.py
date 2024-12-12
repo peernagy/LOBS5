@@ -4,7 +4,7 @@ from lob.encoding import Message_Tokenizer, Vocab
 import pandas as pd
 import jax
 from jax import nn
-from jax.random import PRNGKeyArray
+from jax.random import PRNGKey
 from jax.experimental import checkify
 import chex
 import flax
@@ -173,7 +173,7 @@ def fill_predicted_toks(
         seq: jax.Array,
         pred_logits: jax.Array,
         top_n: int = 1,
-        rng: jax.random.PRNGKeyArray = None,
+        rng: jax.random.PRNGKey = None,
         MASK_TOK: int = Vocab.MASK_TOK,
     ) -> jax.Array:
     """ Set the predicted token in the given sequence
@@ -192,7 +192,7 @@ def fill_predicted_toks(
 def sample_pred(
         pred: jax.Array,
         top_n: int,
-        rng: jax.random.PRNGKeyArray
+        rng: jax.random.PRNGKey,
     ) -> jax.Array:
     """ Sample from the top_n predicted labels
     """
@@ -320,7 +320,7 @@ def pred_msg(
         state: TrainState,
         model: flax.linen.Module,
         batchnorm: bool,
-        rng: PRNGKeyArray,
+        rng: PRNGKey,
         valid_mask_array: Optional[jax.Array] = None,
         sample_top_n: int = 5,
     ) -> np.ndarray:

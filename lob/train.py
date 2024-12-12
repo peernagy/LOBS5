@@ -3,10 +3,13 @@ from jax import random
 import jax.numpy as np
 from jax.scipy.linalg import block_diag
 from flax.training import checkpoints
-import orbax.checkpoint
+from flax import jax_utils
+from orbax.checkpoint import PyTreeCheckpointHandler
+
+import orbax.checkpoint as orbax
 from lob.lob_seq_model import BatchFullLobPredModel, BatchLobPredModel, BatchPaddedLobPredModel
 import wandb
-
+import os
 from lob.init_train import init_train_state, load_checkpoint
 from lob.dataloading import Datasets, create_lobster_prediction_dataset, create_lobster_train_loader
 from lob.lobster_dataloader import LOBSTER, LOBSTER_Dataset
@@ -139,7 +142,7 @@ def train(args):
         # different offsets
         trainloader = create_lobster_train_loader(
             lobster_dataset,
-            int(random.randint(skey, (1,), 0, 100000)),
+            int(random.randint(skey, (1,), 0, 100000)[0]),
             args.bsz,
             num_workers=args.n_data_workers,
             reset_train_offsets=True)
@@ -187,10 +190,11 @@ def train(args):
                 f"\tTrain Loss: {train_loss:.5f}  --Test Loss: {val_loss:.5f} --"
                 f" Test Accuracy: {val_acc:.4f}"
             )
+        state_static=jax_utils.unreplicate(state)
 
         # save checkpoint
         ckpt = {
-            'model': state,
+            'model': state_static,
             'config': vars(args),
             'metrics': {
                 'loss_train': train_loss,
@@ -200,15 +204,17 @@ def train(args):
                 'acc_test': test_acc,
             }
         }
-        orbax_checkpointer = orbax.checkpoint.PyTreeCheckpointer()
+        pytree_handler = PyTreeCheckpointHandler()
+        checkpointer = orbax.Checkpointer(pytree_handler)
+        
         checkpoints.save_checkpoint(
-            ckpt_dir=f'checkpoints/{run.name}_{run.id}',
+            ckpt_dir=f'{os.getcwd()}/checkpoints/{run.name}{run.id}' ,
             target=ckpt,
             step=epoch,
             overwrite=True,
             keep=2,
             keep_every_n_steps=10,
-            orbax_checkpointer=orbax_checkpointer
+            orbax_checkpointer=checkpointer
         )
 
         # For early stopping purposes

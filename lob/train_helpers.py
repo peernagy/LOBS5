@@ -160,7 +160,7 @@ def create_train_state(model_cls,
                            *dummy_input, *integration_timesteps,
                            )
     if batchnorm:
-        params = variables["params"].unfreeze()
+        params = variables["params"]
         batch_stats = variables["batch_stats"]
     else:
         params = variables["params"].unfreeze()
@@ -474,7 +474,7 @@ def train_epoch(
     out_axes=(0, 0))
 def train_step(
         state: train_state.TrainState,
-        rng: jax.random.PRNGKeyArray,  # 3
+        rng: jax.random.PRNGKey,  # 3
         batch_inputs: Tuple[jax.Array, jax.Array], # 4
         batch_labels: jax.Array, # 5
         batch_integration_timesteps: Tuple[jax.Array, jax.Array], # 6

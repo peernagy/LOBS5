@@ -33,9 +33,9 @@ if __name__ == "__main__":
 						help="log with wandb?")
 	parser.add_argument("--wandb_project", type=str, default="LOBS5",
 						help="wandb project name")
-	parser.add_argument("--wandb_entity", type=str, default="peer-nagy",
+	parser.add_argument("--wandb_entity", type=str, default="<your-username>",
 						help="wandb entity name, e.g. username")
-	parser.add_argument("--dir_name", type=str, default='./data',
+	parser.add_argument("--dir_name", type=str, default='<your data folder>',
 						help="name of directory where data is cached")
 	parser.add_argument("--dataset", type=str, choices=Datasets.keys(),
 						default='lobster-prediction',
@@ -43,11 +43,11 @@ if __name__ == "__main__":
 	parser.add_argument("--masking", type=str, choices={'causal', 'random'},
 						default='causal',  # random
 						help="causal or random masking of sequences")
-	parser.add_argument("--use_book_data", type=str2bool, default=False,
+	parser.add_argument("--use_book_data", type=str2bool, default=True,
 		     			help="use book data in addition to message data")
 	parser.add_argument("--use_simple_book", type=str2bool, default=False,
 		     			help="use raw price (-p0) and volume series instead of 'volume image representation'")
-	parser.add_argument("--book_transform", type=str2bool, default=False,
+	parser.add_argument("--book_transform", type=str2bool, default=True,
 		     			help="transform loaded book data to volume image repr. in dataloader")
 	parser.add_argument("--book_depth", type=int, default=500,
 		     			help="number of tick levels to use in book data [if book_transform=True]")
@@ -106,11 +106,11 @@ if __name__ == "__main__":
 						help="True: use batchnorm, False: use layernorm")
 	parser.add_argument("--bn_momentum", type=float, default=0.95,
 						help="batchnorm momentum")
-	parser.add_argument("--bsz", type=int, default=16, #64, (max 16 with full size)
+	parser.add_argument("--bsz", type=int, default=1, #64, (max 16 with full size)
 						help="batch size")
 	parser.add_argument("--num_devices", type=int, default=jax.device_count(),
 		     			help="number of devices (GPUs) to use")
-	parser.add_argument("--epochs", type=int, default=100,  #100, 20
+	parser.add_argument("--epochs", type=int, default=2,  #100, 20
 						help="max number of epochs")
 	parser.add_argument("--early_stop_patience", type=int, default=1000,
 						help="number of epochs to continue training when val loss plateaus")
