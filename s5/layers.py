@@ -1,6 +1,5 @@
 from flax import linen as nn
 import jax
-from jax.ad_checkpoint import checkpoint as jax_checkpoint
 from typing import Any
 
 
@@ -37,7 +36,11 @@ class SequenceLayer(nn.Module):
     def setup(self):
         """Initializes the ssm, batch/layer norm and dropout
         """
-        self.seq = self.ssm(step_rescale=self.step_rescale)
+        # 使用 nn.remat 包装 SSM 以节省内存 (反向时重计算)
+        if self.use_remat:
+            self.seq = nn.remat(self.ssm)(step_rescale=self.step_rescale)
+        else:
+            self.seq = self.ssm(step_rescale=self.step_rescale)
 
         # GPT风格初始化: stddev=0.02 防止梯度爆炸
         gpt_init = nn.initializers.normal(stddev=0.02)
@@ -70,8 +73,7 @@ class SequenceLayer(nn.Module):
         Returns:
             output sequence (float32): (L, d_model)
         """
-        if self.use_remat:
-            return jax_checkpoint(self._forward)(x)
+        # remat 已在 setup() 中应用到 self.seq，直接调用 _forward
         return self._forward(x)
 
     def _forward(self, x):
@@ -124,8 +126,7 @@ class SequenceLayer(nn.Module):
         Returns:
             output sequence (float32): (L, d_model)
         """
-        if self.use_remat:
-            return jax_checkpoint(self._forward_rnn)(hidden, x, d)
+        # remat 已在 setup() 中应用到 self.seq，直接调用 _forward_rnn
         return self._forward_rnn(hidden, x, d)
 
     def _forward_rnn(self, hidden, x, d):

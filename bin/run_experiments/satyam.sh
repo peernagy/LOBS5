@@ -1,0 +1,21 @@
+python run_train.py --USE_WANDB=True\
+                    --wandb_entity='thesatyam-university-of-oxford' \
+                    --wandb_project='lobster-padded-tiny-satyam' \
+                    --C_init=trunc_standard_normal --prenorm=True --batchnorm=False --bidirectional=False \
+                    --blocks=48 --per_gpu_bsz=2 --d_model=3072 --dataset=lobster-prediction --merging=padded \
+                    --dir_name='/lus/lfs1aip2/home/s5e/kangli.s5e/GOOG_GOOGL_2016TO2021_24tok_preproc/GOOG' \
+                    --test_dir_name='/lus/lfs1aip2/home/s5e/kangli.s5e/JAN2023/GOOG_24tok_preproc' \
+                    --data_mode='preproc' \
+                    --clip_eigs=True --activation_fn=half_glu1 \
+                    --dt_global=False --epochs=2 --jax_seed=42 --lr_factor=1 --n_layers=32 \
+                    --opt_config=standard --p_dropout=0.0 --ssm_lr_base=0.0001 --ssm_size_base=3072 \
+                    --warmup_end=1 --weight_decay=0.05 --msg_seq_len=500 \
+                    --use_book_data=True --use_simple_book=False --book_transform=True  \
+                    --masking=none \
+                    --num_devices=4 --n_data_workers=4 \
+                    --debug_loading=False \
+                    --enable_profiler=False \
+                    --random_offsets_train=True \
+                    --shuffle_train=True \
+                    --debug_overfit=False \
+                    --lr_patience=3 \

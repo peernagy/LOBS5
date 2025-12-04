@@ -5,7 +5,7 @@ __pycache__/
 
 # C extensions
 *.so
-
+Miniconda3-latest*
 # Distribution / packaging
 .Python
 build/

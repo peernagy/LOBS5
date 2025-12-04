@@ -142,7 +142,8 @@ def transform_L2_state_numpy(
     mybook = np.zeros(price_levels, dtype=np.int32)
     # print(book_ind[:, 0])
     # print(book_ind[:, 1])
-    mybook[book_ind[:, 0]]=(book_ind[:, 1])
+    # mybook[book_ind[:, 0]]=(book_ind[:, 1])
+    mybook[book_ind[:, 0].astype(int)] = (book_ind[:, 1])
     
     delta_p_mid_and_time=delta_p_mid_and_time.astype(np.float32)
     # Norm seconds to be in [0,1] representing percent of day. 

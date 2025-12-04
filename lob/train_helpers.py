@@ -732,12 +732,12 @@ def train_step(
         # No need for tree_map here - direct use saves 30-40% overhead
 
         # ===== NaN检测点1: 输入参数 =====
-        # params_has_nan = jax.tree_util.tree_reduce(
-        #     lambda a, b: a | b,
-        #     jax.tree_util.tree_map(lambda x: np.any(np.isnan(x)), params),
-        #     False
-        # )
-        # jax.debug.print("[NaN Check 1] Params has NaN: {}", params_has_nan)
+        params_has_nan = jax.tree_util.tree_reduce(
+            lambda a, b: a | b,
+            jax.tree_util.tree_map(lambda x: np.any(np.isnan(x)), params),
+            False
+        )
+        jax.debug.print("[NaN Check 1] Params has NaN: {}", params_has_nan)
 
         if batchnorm:
             logits, mod_vars = state.apply_fn(
@@ -782,28 +782,28 @@ def train_step(
         loss = np.mean(ce)
 
         # ===== NaN检测点3: Loss =====
-        # loss_has_nan = np.isnan(loss)
-        # jax.debug.print("[NaN Check 3] Loss has NaN: {}, value: {:.6f}", loss_has_nan, loss)
+        loss_has_nan = np.isnan(loss)
+        jax.debug.print("[NaN Check 3] Loss has NaN: {}, value: {:.6f}", loss_has_nan, loss)
 
         return loss, (mod_vars, logits,ce)
 
     (loss, (mod_vars, logits,ce)), grads = jax.value_and_grad(loss_fn, has_aux=True)(state.params)
 
     # ===== NaN检测点4: 梯度 =====
-    # grads_has_nan = jax.tree_util.tree_reduce(
-    #     lambda a, b: a | b,
-    #     jax.tree_util.tree_map(lambda x: np.any(np.isnan(x)), grads),
-    #     False
-    # )
-    # jax.debug.print("[NaN Check 4] Grads has NaN: {}", grads_has_nan)
+    grads_has_nan = jax.tree_util.tree_reduce(
+        lambda a, b: a | b,
+        jax.tree_util.tree_map(lambda x: np.any(np.isnan(x)), grads),
+        False
+    )
+    jax.debug.print("[NaN Check 4] Grads has NaN: {}", grads_has_nan)
 
     # ===== NaN检测点5: 梯度范数 =====
-    # grad_norm = np.sqrt(jax.tree_util.tree_reduce(
-    #     lambda a, b: a + b,
-    #     jax.tree_util.tree_map(lambda x: np.sum(x.astype(np.float32) ** 2), grads),
-    #     0.0
-    # ))
-    # jax.debug.print("[NaN Check 5] Grad norm: {:.6f}", grad_norm)
+    grad_norm = np.sqrt(jax.tree_util.tree_reduce(
+        lambda a, b: a + b,
+        jax.tree_util.tree_map(lambda x: np.sum(x.astype(np.float32) ** 2), grads),
+        0.0
+    ))
+    jax.debug.print("[NaN Check 5] Grad norm: {:.6f}", grad_norm)
 
     # ===== 分层梯度统计 (写入JSON文件) =====
     # 计算每个叶子节点的梯度范数
@@ -861,12 +861,12 @@ def train_step(
         state = state.apply_gradients(grads=grads)
 
     # ===== NaN检测点6: 更新后参数 =====
-    # new_params_has_nan = jax.tree_util.tree_reduce(
-    #     lambda a, b: a | b,
-    #     jax.tree_util.tree_map(lambda x: np.any(np.isnan(x)), state.params),
-    #     False
-    # )
-    # jax.debug.print("[NaN Check 6] Updated params has NaN: {}", new_params_has_nan)
+    new_params_has_nan = jax.tree_util.tree_reduce(
+        lambda a, b: a | b,
+        jax.tree_util.tree_map(lambda x: np.any(np.isnan(x)), state.params),
+        False
+    )
+    jax.debug.print("[NaN Check 6] Updated params has NaN: {}", new_params_has_nan)
 
     #return loss, mod_vars, grads, state
     return state, loss, ce, logits

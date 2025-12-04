@@ -204,7 +204,7 @@ def train(args):
         print(f"[DEBUG] Process 0: Creating checkpoint manager options...")
         mgr_options = ocp.CheckpointManagerOptions(
             save_interval_steps=1,
-            create=True,
+            create=False,
             max_to_keep=10,
             keep_period=5,
             # step_prefix=f'{run.name}_{run.id}',
@@ -215,6 +215,7 @@ def train(args):
             multiprocessing_options=MultiprocessingOptions(primary_host=0, active_processes={0})
         )
         print(f"[DEBUG] Process 0: Options created, initializing CheckpointManager...")
+        os.makedirs(f'checkpoints/{run.name}_{run.id}/', exist_ok=True)
         ckpt_mgr = ocp.CheckpointManager(
             os.path.abspath(f'checkpoints/{run.name}_{run.id}/'),
             # ocp.Checkpointer(ocp.PyTreeCheckpointHandler()),

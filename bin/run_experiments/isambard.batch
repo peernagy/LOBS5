@@ -6,7 +6,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --gres=gpu:4
 #SBATCH --mem=0
-#SBATCH --time=01:00:00
+#SBATCH --time=02:00:00
 #SBATCH --contiguous
 
 # ============================================
@@ -30,8 +30,8 @@ echo ""
 # Create logs directory
 mkdir -p logs_lobs5_3072x32
 
-# Change to working directory
-cd /lus/lfs1aip2/home/s5e/kangli.s5e/AlphaTrade/LOBS5
+# # Change to working directory
+# cd /lus/lfs1aip2/home/s5e/kangli.s5e/AlphaTrade/LOBS5
 
 # ============================================
 # Multi-Node Setup (if NNODES > 1)
@@ -71,7 +71,7 @@ echo ""
 # Run training
 if [ $NNODES -eq 1 ]; then
     # Single-node: use wrapper script for environment setup
-    bash /lus/lfs1aip2/home/s5e/kangli.s5e/AlphaTrade/LOBS5/bin/run_experiments/run_lobster_padded_large.sh \
+    bash bash /home/s5e/satyamaga.s5e/LOBS5/bin/run_experiments/satyam.sh\
         2>&1 | tee logs_lobs5_3072x32/training_${SLURM_JOB_ID}.log
 else
     # Multi-node: use srun with wrapper script
@@ -82,7 +82,8 @@ else
          --gpu-bind=map_gpu:0,1,2,3 \
          --output=logs_lobs5_3072x32/training_${SLURM_JOB_ID}_node%n.log \
          --export=ALL \
-         bash /lus/lfs1aip2/home/s5e/kangli.s5e/AlphaTrade/LOBS5/bin/run_experiments/run_lobster_padded_large.sh
+         bash /home/s5e/satyamaga.s5e/LOBS5/bin/run_experiments/satyam.sh
+        #  bash /lus/lfs1aip2/home/s5e/kangli.s5e/AlphaTrade/LOBS5/bin/run_experiments/run_lobster_padded_large.sh
 fi
 
 echo ""

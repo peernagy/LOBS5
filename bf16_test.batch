@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH --job-name=simple_jax_run
+#SBATCH --output=logs/job_%j.out   # Standard output log
+#SBATCH --error=logs/job_%j.err    # Error log
+#SBATCH --nodes=1                  # Run on a single node
+#SBATCH --ntasks=1                 # Run a single task
+#SBATCH --gres=gpu:1               # Request 1 GPU (Change to :4 to use all if needed)
+#SBATCH --time=00:05:00            # Time limit
+
+# --- 1. Preparation ---
+echo "Job started on node: $(hostname)"
+mkdir -p logs  # Ensure log directory exists
+
+
+# --- 3. JAX Optimisation (Optional) ---
+# Prevents JAX from allocating 100% of GPU memory instantly
+export XLA_PYTHON_CLIENT_PREALLOCATE=false 
+
+# --- 4. Run the Python Script ---
+# Replace 'my_script.py' with your actual filename
+python bf16_complex_test.py
+
+echo "Job finished"
